@@ -5,7 +5,12 @@ const { Server } = require("socket.io");
 const { generateResponse } = require('./src/service/ai.service');
 
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+
+  }
+});
 
 const chatHistory = [];
 
@@ -31,7 +36,7 @@ io.on("connection", (socket) => {
    })
    
 
- socket.emit("ai-message-response", { response });
+ socket.emit("ai-message-response", response );
  });
 });
 
