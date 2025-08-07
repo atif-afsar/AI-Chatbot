@@ -7,6 +7,8 @@ const { generateResponse } = require('./src/service/ai.service');
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
+const chatHistory = [];
+
 io.on("connection", (socket) => {
  console.log("user connected");
 
@@ -15,9 +17,19 @@ io.on("connection", (socket) => {
  });
  
  socket.on("ai-message", async (data) => {
-   console.log("AI request:", data.prompt);
-   const response = await generateResponse(data.prompt);
- console.log("AI response:", response);
+   console.log("AI request:", data);
+
+   chatHistory.push({
+     role: "user",
+     parts: [{text: data}]
+   })
+   const response = await generateResponse(chatHistory );
+
+   chatHistory.push({
+     role: "model",
+     parts: [{text: response}]
+   })
+   
 
  socket.emit("ai-message-response", { response });
  });
@@ -26,7 +38,7 @@ io.on("connection", (socket) => {
 
 
  
- 
+  
 httpServer.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
